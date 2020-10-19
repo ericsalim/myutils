@@ -2,5 +2,5 @@
 
 My personal utilities. That's all.
 
-- [Encryptor](/myutils/encrypt-aes.html)
+- [Encryptor](https://ericsalim.github.io/myutils/encrypt-aes.html)
 
