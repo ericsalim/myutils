@@ -12,25 +12,28 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-12" style="text-align: center;">
-                    <h3>AES Encrypt / Decrypt</h3>
+
+                   <h3>AES Encrypt / Decrypt</h3>
+
                     <div class="form-group">
                         <input id="txtPassword"
                             type="password" autocomplete="new-password"
                             class="form-control"
                             placeholder="Password" />
                     </div>
+
                     <div class="form-group">
                         <button id="btnEncrypt" type="button" class="btn btn-success">Encrypt</button>
                         <span style="margin-right: 30px;"></span>
                         <button id="btnDecrypt" type="button" class="btn btn-warning">Decrypt</button>
-                        <span id="btnClear" style="margin-right: 60px;"></span>
-                        <button type="button" class="btn btn-secondary">Clear</button>
+                        <span style="margin-right: 60px;"></span>
+                        <button id="btnClear" type="button" class="btn btn-secondary">Clear</button>
                     </div>
+
                     <div class="form-group">
                         <textarea id="txaContent"
                             class="form-control"
-                            style="height: 300px;"
-                            ></textarea>
+                            style="height: 200px;"></textarea>
                     </div>
                 </div>
             </div>
@@ -43,6 +46,28 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js" integrity="sha512-nOQuvD9nKirvxDdvQ9OMqe2dgapbPB7vYAMrzJihw5m+aNcf0dX53m6YxM4LgA9u8e9eg9QX+/+mPu8kCNpV2A==" crossorigin="anonymous"></script>
 
         <script type="text/javascript">
+            $(document).ready(function() {
+                var $txaContent = $('#txaContent');
+
+                //expand textarea to fill the screen
+                var txaContentTop = $($txaContent).offset().top;
+                var docHeight = $(document).height();
+                var buffer = 30;
+                $($txaContent).height(docHeight - txaContentTop - buffer);
+            });
+
+            $('#btnEncrypt').click(function() {
+            
+            });
+            
+            $('#btnDecrypt').click(function() {
+            
+            });
+
+            $('#btnClear').click(function() {
+                $('#txtPassword').val('');
+                $('#txaContent').val('');
+            });
         </script>
     </body>
 </html>
