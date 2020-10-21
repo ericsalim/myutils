@@ -47,21 +47,26 @@
 
         <script type="text/javascript">
             $(document).ready(function() {
-                var $txaContent = $('#txaContent');
-
                 //expand textarea to fill the screen
-                var txaContentTop = $($txaContent).offset().top;
+                var txaContentTop = $('#txaContent').offset().top;
                 var docHeight = $(document).height();
                 var buffer = 30;
-                $($txaContent).height(docHeight - txaContentTop - buffer);
+                $('#txaContent').height(docHeight - txaContentTop - buffer);
             });
 
             $('#btnEncrypt').click(function() {
-            
+                var password = $('#txtPassword').val();
+                var plain = $('#txaContent').val();
+                var encrypted = CryptoJS.AES.encrypt(plain, password);
+                $('#txaContent').val(encrypted);
             });
             
             $('#btnDecrypt').click(function() {
-            
+                var password = $('#txtPassword').val();
+                var encrypted = $('#txaContent').val();
+                var plainObj = CryptoJS.AES.decrypt(encrypted, password);
+                var plainStr = plainObj.toString(CryptoJS.enc.Utf8);
+                $('#txaContent').val(plainStr);
             });
 
             $('#btnClear').click(function() {
