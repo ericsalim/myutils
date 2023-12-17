@@ -8,42 +8,79 @@
 
         <link rel="icon" type="image/png" href="https://ericsalim.github.io/myutils/favicon-192.png">
 
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+        <style>
+            body {
+                font-family: Verdana, Geneva, Tahoma, sans-serif;
+                background-color: #fcfcfc;
+            }
+
+            h3 {
+                text-align: center;
+            }
+
+            .container {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .container div:not(:first-child) {
+                margin-top: 10px;
+            }
+
+            .action-container {
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+            }
+
+            input, textarea {
+                font-size: 1.3em;
+                border: 1px solid lightgray;
+                border-radius: 5px;
+                background-color: #fcfcfc;
+            }
+
+            button {
+                font-size: 1em;
+                height: 2.5em;
+                min-width: 8em;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                color: white;
+            }
+
+            #txtPassword {
+                width: 100%;
+            }
+
+            #txaContent {
+                height: 200px;
+                width: 100%
+            }
+            
+        </style>
     </head>
     <body>
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-12" style="text-align: center;">
+        <h3>AES Encrypt / Decrypt</h3>
 
-                   <h3>AES Encrypt / Decrypt</h3>
+        <div class="container">
+            <div>
+                <input id="txtPassword" type="password" autocomplete="new-password" placeholder="Password" />
+            </div>
 
-                    <div class="form-group">
-                        <input id="txtPassword"
-                            type="password" autocomplete="new-password"
-                            class="form-control"
-                            placeholder="Password" />
-                    </div>
+            <div class="action-container">
+                <button id="btnEncrypt" type="button" style="background-color: darkolivegreen;"">Encrypt</button>
+                <button id="btnDecrypt" type="button" style="margin-left: 10px; background-color: darkgoldenrod;">Decrypt</button>
+                <button id="btnClear" type="button" style="margin-left: 10px; background-color: dimgray;">Clear</button>
+            </div>
 
-                    <div class="form-group">
-                        <button id="btnEncrypt" type="button" class="btn btn-success">Encrypt</button>
-                        <span style="margin-right: 30px;"></span>
-                        <button id="btnDecrypt" type="button" class="btn btn-warning">Decrypt</button>
-                        <span style="margin-right: 60px;"></span>
-                        <button id="btnClear" type="button" class="btn btn-secondary">Clear</button>
-                    </div>
-
-                    <div class="form-group">
-                        <textarea id="txaContent"
-                            class="form-control"
-                            style="height: 200px;"></textarea>
-                    </div>
-                </div>
+            <div>
+                <textarea id="txaContent"></textarea>
             </div>
         </div>
 
         <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
-
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js" integrity="sha384-LtrjvnR4Twt/qOuYxE721u19sVFLVSA4hf/rRt6PrZTmiPltdZcI7q7PXQBYTKyf" crossorigin="anonymous"></script>
 
         <script type="text/javascript">
 
