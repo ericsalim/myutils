@@ -45,9 +45,105 @@
 
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js" integrity="sha384-LtrjvnR4Twt/qOuYxE721u19sVFLVSA4hf/rRt6PrZTmiPltdZcI7q7PXQBYTKyf" crossorigin="anonymous"></script>
 
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js" integrity="sha512-nOQuvD9nKirvxDdvQ9OMqe2dgapbPB7vYAMrzJihw5m+aNcf0dX53m6YxM4LgA9u8e9eg9QX+/+mPu8kCNpV2A==" crossorigin="anonymous"></script>
-
         <script type="text/javascript">
+
+            // Taken and modified from https://github.com/bradyjoslin/webcrypto-example
+
+            function bytesToBase64(byteArr) {
+                const base64ByteArr = new Uint8Array(byteArr).reduce((data, byte) => data + String.fromCharCode(byte), '')
+                return btoa(base64ByteArr);
+            };
+
+            function base64ToBytes(base64) {
+                const byteArr = Uint8Array.from(atob(base64), (c) => c.charCodeAt(null));
+                return byteArr;
+            }
+
+            async function importKey(plainKey) {
+                const importedKey = await crypto.subtle.importKey(
+                    'raw',
+                    new TextEncoder().encode(plainKey), 
+                    'PBKDF2',
+                    false,
+                    ['deriveKey']);
+
+                return importedKey;
+            }
+
+            async function deriveKey(importedKey, saltByteArr) {
+                const derivedKey = await crypto.subtle.deriveKey(
+                    { name: 'PBKDF2', salt: saltByteArr, iterations: 600000, hash: 'SHA-256' },
+                    importedKey,
+                    { name: 'AES-GCM', length: 256 },
+                    false,
+                    ['encrypt', 'decrypt']
+                );
+
+                return derivedKey;
+            }
+
+            function joinEncryptedByteArr(saltByteArr, ivByteArr, encryptedByteArr) {
+                let joinedByteArr = new Uint8Array(saltByteArr.byteLength + ivByteArr.byteLength + encryptedByteArr.byteLength);
+                joinedByteArr.set(saltByteArr, 0);
+                joinedByteArr.set(ivByteArr, saltByteArr.byteLength);
+                joinedByteArr.set(encryptedByteArr, saltByteArr.byteLength + ivByteArr.byteLength);
+                const base64 = bytesToBase64(joinedByteArr);
+                return base64;
+            }
+
+            function sliceEncryptedBase64(joinedBase64) {
+                const joinedByteArr = base64ToBytes(joinedBase64);
+                const saltByteArr = joinedByteArr.slice(0, 16);
+                const ivByteArr = joinedByteArr.slice(16, 16 + 12);
+                const encryptedByteArr = joinedByteArr.slice(16 + 12);
+                return { 
+                    saltByteArr: saltByteArr,
+                    ivByteArr: ivByteArr,
+                    encryptedByteArr: encryptedByteArr
+                };
+            }
+
+            async function encrypt(plainText, plainKey) {
+                try {
+                    const importedKey = await importKey(plainKey);
+                    const saltByteArr = crypto.getRandomValues(new Uint8Array(16));
+                    const derivedKey = await deriveKey(importedKey, saltByteArr);
+                    const ivByteArr = crypto.getRandomValues(new Uint8Array(12));
+                    const encryptedBuffer = await crypto.subtle.encrypt(
+                        { name: 'AES-GCM', iv: ivByteArr },
+                        derivedKey,
+                        new TextEncoder().encode(plainText));
+
+                    const encryptedByteArr = new Uint8Array(encryptedBuffer);
+                    const base64 = joinEncryptedByteArr(saltByteArr, ivByteArr, encryptedByteArr);
+                    return base64;
+                } catch (e) {
+                    alert(`Error: ${e}`);
+                }
+            }
+
+            async function decrypt(encryptedBase64, plainKey) {
+                try {
+                    const sliced = sliceEncryptedBase64(encryptedBase64);
+                    const saltByteArr = sliced.saltByteArr;
+                    const ivByteArr = sliced.ivByteArr;
+                    const encryptedByteArr = sliced.encryptedByteArr;
+
+                    const importedKey = await importKey(plainKey);
+                    const derivedKey = await deriveKey(importedKey, saltByteArr);
+
+                    const plainTextByteArr = await window.crypto.subtle.decrypt(
+                        { name: 'AES-GCM', iv: ivByteArr },
+                        derivedKey,
+                        encryptedByteArr);
+                        
+                    const plainText = new TextDecoder().decode(plainTextByteArr);
+                    return plainText
+                } catch (e) {
+                    alert(`Error: ${e}`);
+                }
+            }
+
             $(document).ready(function() {
                 //expand textarea to fill the screen
                 var txaContentTop = $('#txaContent').offset().top;
@@ -56,19 +152,18 @@
                 $('#txaContent').height(docHeight - txaContentTop - buffer);
             });
 
-            $('#btnEncrypt').click(function() {
+            $('#btnEncrypt').click(async function() {
                 var password = $('#txtPassword').val();
                 var plain = $('#txaContent').val();
-                var encrypted = CryptoJS.AES.encrypt(plain, password);
-                $('#txaContent').val(encrypted);
+                var encryptedBase64 = await encrypt(plain, password)
+                $('#txaContent').val(encryptedBase64);
             });
             
-            $('#btnDecrypt').click(function() {
+            $('#btnDecrypt').click(async function() {
                 var password = $('#txtPassword').val();
                 var encrypted = $('#txaContent').val();
-                var plainObj = CryptoJS.AES.decrypt(encrypted, password);
-                var plainStr = plainObj.toString(CryptoJS.enc.Utf8);
-                $('#txaContent').val(plainStr);
+                var plainText = await decrypt(encrypted, password);
+                $('#txaContent').val(plainText);
             });
 
             $('#btnClear').click(function() {
