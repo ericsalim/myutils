@@ -70,17 +70,24 @@
             </div>
 
             <div class="action-container">
-                <button id="btnEncrypt" type="button" style="background-color: darkolivegreen;"">Encrypt</button>
-                <button id="btnDecrypt" type="button" style="margin-left: 10px; background-color: darkgoldenrod;">Decrypt</button>
-                <button id="btnClear" type="button" style="margin-left: 10px; background-color: dimgray;">Clear</button>
+                <button id="btnEncrypt" type="button" onclick="handleEncrypt();"
+                    style="background-color: darkolivegreen;">
+                    Encrypt
+                </button>
+                <button id="btnDecrypt" type="button" onclick="handleDecrypt();" 
+                    style="margin-left: 10px; background-color: darkgoldenrod;">
+                    Decrypt
+                </button>
+                <button id="btnClear" type="button" onclick="handleClear();"
+                    style="margin-left: 10px; background-color: dimgray;">
+                    Clear
+                </button>
             </div>
 
             <div>
                 <textarea id="txaContent"></textarea>
             </div>
         </div>
-
-        <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
 
         <script type="text/javascript">
 
@@ -181,32 +188,49 @@
                 }
             }
 
-            $(document).ready(function() {
-                //expand textarea to fill the screen
-                var txaContentTop = $('#txaContent').offset().top;
-                var docHeight = $(document).height();
-                var buffer = 30;
-                $('#txaContent').height(docHeight - txaContentTop - buffer);
-            });
+            async function handleEncrypt() {
+                const $txtPassword = document.querySelector('#txtPassword');
+                const $txaContent = document.querySelector('#txaContent');
 
-            $('#btnEncrypt').click(async function() {
-                var password = $('#txtPassword').val();
-                var plain = $('#txaContent').val();
-                var encryptedBase64 = await encrypt(plain, password)
-                $('#txaContent').val(encryptedBase64);
+                if ($txaContent.value.trim() === '' || $txtPassword.value.trim() === '')
+                    return;
+
+                    const encryptedBase64 = await encrypt($txaContent.value, $txtPassword.value)
+                $txaContent.value = encryptedBase64;
+            }
+
+            async function handleDecrypt() {
+                const $txtPassword = document.querySelector('#txtPassword');
+                const $txaContent = document.querySelector('#txaContent');
+
+                if ($txaContent.value.trim() === '' || $txtPassword.value.trim() === '')
+                    return;
+
+                const plainText = await decrypt($txaContent.value, $txtPassword.value)
+                $txaContent.value = plainText;
+            }
+
+            async function handleClear() {
+                const $txtPassword = document.querySelector('#txtPassword');
+                const $txaContent = document.querySelector('#txaContent');
+
+                $txtPassword.value = '';
+                $txaContent.value = '';
+            }
+
+            function expandTextArea() {
+                //expand textarea to fill the screen
+                const docHeight = document.documentElement.scrollHeight;
+                const $txaContent = document.querySelector('#txaContent');
+                const txaContentTop = $txaContent.offsetTop;
+                const buffer = 30;
+                $txaContent.style.height = `${docHeight - txaContentTop - buffer}px`;
+            }
+
+            document.addEventListener('DOMContentLoaded', () => {
+                expandTextArea();
             });
             
-            $('#btnDecrypt').click(async function() {
-                var password = $('#txtPassword').val();
-                var encrypted = $('#txaContent').val();
-                var plainText = await decrypt(encrypted, password);
-                $('#txaContent').val(plainText);
-            });
-
-            $('#btnClear').click(function() {
-                $('#txtPassword').val('');
-                $('#txaContent').val('');
-            });
         </script>
     </body>
 </html>
